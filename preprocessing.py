@@ -6,7 +6,7 @@ purposes.
 ## ----------------------------------------------------------------------------##
 ## Import Dependencies ##
 import spacy
-nlp = spacy.load('en') # Load English model package using 'en' shortcut link.  By default, we're using the en_core_web_sm model.
+nlp = spacy.load('en_core_web_sm') # Load English model package using 'en' shortcut link.  By default, we're using the en_core_web_sm model.
 import re
 import json
 
@@ -44,18 +44,27 @@ class Preprocessing:
         
         Args: 
             text: A text document we are interested in searching through for matching excerpts. 
-            patterns: A dicionary of patterns.  Each pattern has a value that is a list of dictionaries.  This list of dictionaries are SpaCy patterns.  
+            patterns: A dictionary of patterns.  Each pattern has a value that is a list of dictionaries.  This list of
+            dictionaries are SpaCy patterns.  
         Output: 
-            A list of exerpts that match our patterns from the original document.  
+            A list of excerpts that match our patterns from the original document.  
         '''
         mentions = []
+        pattern_list = []
         
         doc = nlp(text)
         
         # Matcher class object
         matcher = Matcher(nlp.vocab, validate=True)
-        for key, value in patterns.items():
-            matcher.add(key, None, value)    
+        # OLD: loop works for earlier version of SpaCy
+        # for key, value in patterns.items():
+        #     matcher.add(key, None, value)   
+        # Replacement
+        for value in patterns.values():
+            pattern_list.append(value)
+        
+        matcher.add("ef_patterns", pattern_list)
+        
         matches = matcher(doc)
         
         # finding patterns in the text
